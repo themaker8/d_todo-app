@@ -1,11 +1,23 @@
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'https://task-manager-backend-qqxr.onrender.com/api';
 
 export const api = {
   async getTasks(address: string) {
     try {
+      console.log('Fetching tasks for address:', address);
+      console.log('Fetch URL:', `${BASE_URL}/tasks?address=${address}`);
+      
       const response = await fetch(`${BASE_URL}/tasks?address=${address}`);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      return await response.json();
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error('Failed to fetch tasks');
+      }
+      
+      const data = await response.json();
+      console.log('Fetched tasks:', data);
+      return data;
     } catch (error) {
       console.error('Error fetching tasks:', error);
       throw error;
@@ -14,6 +26,7 @@ export const api = {
 
   async createTask(data: any) {
     try {
+      console.log('Creating task with data:', data);
       const response = await fetch(`${BASE_URL}/tasks`, {
         method: 'POST',
         headers: {
@@ -21,44 +34,18 @@ export const api = {
         },
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error('Failed to create task');
-      return await response.json();
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error('Failed to create task');
+      }
+      
+      const result = await response.json();
+      console.log('Created task:', result);
+      return result;
     } catch (error) {
       console.error('Error creating task:', error);
-      throw error;
-    }
-  },
-
-  async toggleTask(taskId: string, address: string) {
-    try {
-      const response = await fetch(`${BASE_URL}/tasks/${taskId}/toggle`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address }),
-      });
-      if (!response.ok) throw new Error('Failed to toggle task');
-      return await response.json();
-    } catch (error) {
-      console.error('Error toggling task:', error);
-      throw error;
-    }
-  },
-
-  async deleteTask(taskId: string, address: string) {
-    try {
-      const response = await fetch(`${BASE_URL}/tasks/${taskId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address }),
-      });
-      if (!response.ok) throw new Error('Failed to delete task');
-      return await response.json();
-    } catch (error) {
-      console.error('Error deleting task:', error);
       throw error;
     }
   }
