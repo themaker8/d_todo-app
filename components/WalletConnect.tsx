@@ -7,11 +7,7 @@ interface Props {
   onConnect: (address: string) => void;
 }
 
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
-}
+// Remove the global declaration here since it's conflicting
 
 export default function WalletConnect({ onConnect }: Props) {
   const [isConnecting, setIsConnecting] = useState(false);
@@ -22,9 +18,12 @@ export default function WalletConnect({ onConnect }: Props) {
       setIsConnecting(true);
       setError(null);
 
-      if (typeof window.ethereum !== 'undefined') {
-        const provider = new BrowserProvider(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
+      // Use type assertion here
+      const ethereum = (window as any).ethereum;
+
+      if (typeof ethereum !== 'undefined') {
+        const provider = new BrowserProvider(ethereum);
+        await ethereum.request({ method: 'eth_requestAccounts' });
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         onConnect(address);
