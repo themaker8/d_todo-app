@@ -2,10 +2,15 @@
 
 import { useState } from 'react';
 import { BrowserProvider } from 'ethers';
-import { MetaMaskInpageProvider } from "@metamask/providers";
 
 interface Props {
   onConnect: (address: string) => void;
+}
+
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
 }
 
 export default function WalletConnect({ onConnect }: Props) {
@@ -18,7 +23,7 @@ export default function WalletConnect({ onConnect }: Props) {
       setError(null);
 
       if (typeof window.ethereum !== 'undefined') {
-        const provider = new BrowserProvider(window.ethereum as any);
+        const provider = new BrowserProvider(window.ethereum);
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
