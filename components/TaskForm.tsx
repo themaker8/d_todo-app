@@ -1,113 +1,89 @@
 'use client';
 
 import { useState } from 'react';
-import { api } from '@/lib/api';
 
-export default function TaskForm({ address }: { address: string }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [priority, setPriority] = useState('medium');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function TaskForm({ onSubmit }: { onSubmit: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+    priority: 'medium'
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      await api.createTask({
-        address,
-        title,
-        description,
-        due_date: dueDate,
-        priority,
-      });
-
-      // Reset form
-      setTitle('');
-      setDescription('');
-      setDueDate('');
-      setPriority('medium');
-      
-      // Trigger task list refresh
-      window.dispatchEvent(new CustomEvent('taskCreated'));
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to create task');
-    } finally {
-      setIsSubmitting(false);
-    }
+    onSubmit(formData);
+    setFormData({ title: '', description: '', dueDate: '', priority: 'medium' });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6">
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Create New Task</h2>
+      
       <div className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Title
           </label>
           <input
             type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter task title"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Description
           </label>
           <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            rows={3}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32 resize-none"
+            placeholder="Enter task description"
           />
         </div>
 
-        <div>
-          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
-            Due Date
-          </label>
-          <input
-            type="date"
-            id="dueDate"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Due Date
+            </label>
+            <input
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
-            Priority
-          </label>
-          <select
-            id="priority"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Priority
+            </label>
+            <select
+              value={formData.priority}
+              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
         </div>
 
         <button
           type="submit"
-          disabled={isSubmitting}
-          className={`w-full px-4 py-2 text-white rounded-md transition ${
-            isSubmitting 
-              ? 'bg-blue-400 cursor-not-allowed' 
-              : 'bg-blue-500 hover:bg-blue-600'
-          }`}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2"
         >
-          {isSubmitting ? 'Creating...' : 'Create Task'}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+          </svg>
+          <span>Create Task</span>
         </button>
       </div>
     </form>
