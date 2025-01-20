@@ -1,9 +1,15 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
+const BASE_URL = 'https://d-todo-app-backend-new.onrender.com/api';
 
 export const api = {
   async getTasks(address: string) {
     try {
-      const response = await fetch(`${BASE_URL}/tasks?address=${address}`);
+      const response = await fetch(`${BASE_URL}/tasks?address=${address}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          // Add origin header
+          'Origin': 'https://decen-todo-app.vercel.app'
+        },
+      });
       if (!response.ok) throw new Error('Failed to fetch tasks');
       return await response.json();
     } catch (error) {
@@ -12,12 +18,14 @@ export const api = {
     }
   },
 
+  // Update other methods similarly
   async createTask(data: any) {
     try {
       const response = await fetch(`${BASE_URL}/tasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Origin': 'https://decen-todo-app.vercel.app'
         },
         body: JSON.stringify(data),
       });
@@ -35,6 +43,7 @@ export const api = {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Origin': 'https://decen-todo-app.vercel.app'
         },
         body: JSON.stringify({ address }),
       });
@@ -52,6 +61,7 @@ export const api = {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Origin': 'https://decen-todo-app.vercel.app'
         },
         body: JSON.stringify({ address }),
       });
