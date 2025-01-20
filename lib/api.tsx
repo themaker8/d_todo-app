@@ -1,6 +1,10 @@
-const BASE_URL = 'https://task-manager-backend-qqxr.onrender.com/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://task-manager-backend-qqxr.onrender.com/api';
+// or if you're using 127.0.0.1
+// const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
 
 export const api = {
+  // ... rest of your code
+
   async getTasks(address: string) {
     try {
       console.log('Fetching tasks for address:', address);
